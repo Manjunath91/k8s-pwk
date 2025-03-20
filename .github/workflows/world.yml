@@ -1,0 +1,30 @@
+name: Deploy Ingress
+
+on:
+  push:
+    branches:
+      - main  # Change to 'master' or your branch name if needed
+    paths:
+      - "ingress.yaml"  # Only trigger when ingress.yaml changes
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Apply Ingress
+        run: |
+          kubectl apply -f world.yaml
+
+      - name: Verify Deployment
+        run: |
+          kubectl get ingress
